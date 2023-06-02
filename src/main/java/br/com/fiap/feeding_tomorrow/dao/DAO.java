@@ -3,10 +3,7 @@ package br.com.fiap.feeding_tomorrow.dao;
 import jakarta.ws.rs.NotFoundException;
 
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,15 +95,35 @@ public class DAO<T> {
             Class attrClass = getAttrClass(attr);
 
             if (attrClass.equals(String.class)) {
-                ps.setString(++i, (String) attrValue);
+                if (attrValue == null) {
+                    ps.setNull(++i, Types.VARCHAR);
+                } else {
+                    ps.setString(++i, (String) attrValue);
+                }
             } else if (attrClass.equals(Integer.class)) {
-                ps.setInt(++i, (Integer) attrValue);
+                if (attrValue == null) {
+                    ps.setNull(++i, Types.INTEGER);
+                } else {
+                    ps.setInt(++i, (Integer) attrValue);
+                }
             } else if (attrClass.equals(Double.class)) {
-                ps.setDouble(++i, (Double) attrValue);
+                if (attrValue == null) {
+                    ps.setNull(++i, Types.DOUBLE);
+                } else {
+                    ps.setDouble(++i, (Double) attrValue);
+                }
             } else if (attrClass.equals(Boolean.class)) {
-                ps.setBoolean(++i, (Boolean) attrValue);
+                if (attrValue == null) {
+                    ps.setNull(++i, Types.BOOLEAN);
+                } else {
+                    ps.setBoolean(++i, (Boolean) attrValue);
+                }
             } else if (attrClass.equals(LocalDateTime.class)) {
-                ps.setTimestamp(++i, Timestamp.valueOf((LocalDateTime) attrValue));
+                if (attrValue == null) {
+                    ps.setNull(++i, Types.TIMESTAMP);
+                } else {
+                    ps.setTimestamp(++i, Timestamp.valueOf((LocalDateTime) attrValue));
+                }
             }
         }
     }
@@ -207,7 +224,7 @@ public class DAO<T> {
             String[] returnId = {this.idColumn};
             ps = connection.prepareStatement(getCreateSQL(), returnId);
             setAllFields(ps, entity);
-            ps.executeUpdate();
+            ps.execute();
 
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
