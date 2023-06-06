@@ -243,6 +243,42 @@ public class DAO<T> {
     }
 
     /**
+     * Cria uma entidade T.
+     *
+     * @param entity           entidade T.
+     * @param attributeToCheck atributo a ser verificado se existe na tabela.
+     * @throws Exception caso ocorra algum erro ao criar a entidade.
+     */
+    public void create(T entity, String attributeToCheck) throws Exception {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            if (attributeExistsInTable(attributeToCheck.toUpperCase(), getAttrFromEntity(entity, "get" + attributeToCheck))) {
+                return;
+            }
+
+            String[] returnId = {this.idColumn};
+            ps = connection.prepareStatement(getCreateSQL(), returnId);
+            setAllFields(ps, entity);
+            ps.execute();
+
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                setAttrFromEntity("set" + pascalCase(this.idColumn), Integer.class, rs.getInt(1), entity);
+            }
+
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+        }
+    }
+
+    /**
      * Seleciona uma entidade T.
      *
      * @param id ID da entidade T.
@@ -325,6 +361,26 @@ public class DAO<T> {
 
             if (rowAffected == 0) {
                 throw new NotFoundException(String.format("%s ID %d not found.", clazz.getSimpleName(), id));
+            }
+        }
+    }
+
+    /**
+     * Verifica se um atributo existe na tabela.
+     *
+     * @param attributeName  nome do atributo.
+     * @param attributeValue valor do atributo.
+     * @return true se o atributo existe na tabela, false caso contrário.
+     * @throws SQLException caso ocorra algum erro ao verificar se o atributo existe na tabela.
+     */
+    private boolean attributeExistsInTable(String attributeName, Object attributeValue) throws SQLException {
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", tableName, attributeName);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setObject(1, attributeValue);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                int count = rs.getInt(1);
+                return count > 0;
             }
         }
     }
