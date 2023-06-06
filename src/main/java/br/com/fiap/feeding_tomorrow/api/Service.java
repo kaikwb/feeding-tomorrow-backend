@@ -64,9 +64,9 @@ public class Service<T> {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEntities() {
+    public Response getEntities(@QueryParam("sort_by") String sortBy, @QueryParam("asc") Boolean ascending, @QueryParam("limit") Integer limit, @QueryParam("page") Integer page) {
         try {
-            return Response.status(200).entity(this.entityDAO.get()).build();
+            return Response.status(200).entity(this.entityDAO.get(sortBy, ascending, page, limit)).build();
         } catch (Exception e) {
             return createResponseOnException(e);
         }

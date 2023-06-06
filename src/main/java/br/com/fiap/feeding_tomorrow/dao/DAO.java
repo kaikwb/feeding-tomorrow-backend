@@ -187,7 +187,7 @@ public class DAO<T> {
      * @return código SQL.
      */
     public String getAllSelectSQL() {
-        return String.format("SELECT * FROM %s ORDER BY %s", tableName, idColumn);
+        return String.format("SELECT * FROM %s", tableName);
     }
 
     /**
@@ -312,11 +312,41 @@ public class DAO<T> {
     /**
      * Seleciona todas as entidades T.
      *
+     * @param orderBy      coluna para ordenar.
+     * @param ascending    se a ordenação é ascendente.
+     * @param page         página a ser selecionada.
+     * @param itemsPerPage quantidade de itens por página.
      * @return lista de entidades T.
      * @throws Exception caso ocorra algum erro ao selecionar as entidades.
      */
-    public List<T> get() throws Exception {
-        try (PreparedStatement ps = connection.prepareStatement(getAllSelectSQL())) {
+    public List<T> get(String orderBy, Boolean ascending, Integer page, Integer itemsPerPage) throws Exception {
+        StringBuilder sqlBuilder = new StringBuilder(getAllSelectSQL());
+
+        if (orderBy == null) {
+            orderBy = idColumn;
+        }
+
+        if (ascending == null) {
+            ascending = true;
+        }
+
+        if (page == null) {
+            page = 1;
+        }
+
+        if (itemsPerPage == null) {
+            itemsPerPage = 10;
+        }
+
+        if (orderBy != null) {
+            String order = ascending ? "ASC" : "DESC";
+            sqlBuilder.append(" ORDER BY ").append(orderBy).append(" ").append(order);
+        }
+
+        int offset = (page - 1) * itemsPerPage;
+        sqlBuilder.append(" OFFSET ").append(offset).append(" ROWS FETCH NEXT ").append(itemsPerPage).append(" ROWS ONLY");
+
+        try (PreparedStatement ps = connection.prepareStatement(sqlBuilder.toString())) {
             List<T> entityList = new ArrayList<>();
 
             ResultSet rs = ps.executeQuery();
