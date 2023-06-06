@@ -187,7 +187,7 @@ public class DAO<T> {
      * @return código SQL.
      */
     public String getAllSelectSQL() {
-        return String.format("SELECT * FROM %s", tableName);
+        return String.format("SELECT * FROM %s ORDER BY %s", tableName, idColumn);
     }
 
     /**
