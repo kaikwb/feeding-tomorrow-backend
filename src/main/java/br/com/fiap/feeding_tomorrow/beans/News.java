@@ -1,18 +1,16 @@
 package br.com.fiap.feeding_tomorrow.beans;
 
-import jakarta.json.bind.annotation.JsonbDateFormat;
-
-import java.time.LocalDateTime;
+import jakarta.annotation.Nullable;
 
 public class News {
     private Integer id;
     private String title;
+    @Nullable
     private String description;
     private String source;
-    @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime pubDate;
     private String link;
-    private String guid;
+    @Nullable
+    private String thumbnail;
 
 
     /**
@@ -21,27 +19,25 @@ public class News {
     public News() {
     }
 
-
     /**
-     * Cria um objeto de notícia com dados.
+     * Cria um objeto de notícia com os dados informados.
      *
      * @param id          identificador da notícia.
      * @param title       título da notícia.
      * @param description descrição da notícia.
      * @param source      fonte da notícia.
-     * @param pubDate     data de publicação da notícia.
      * @param link        link da notícia.
-     * @param guid        identificador da notícia.
+     * @param thumbnail   link da imagem da notícia.
      */
-    public News(Integer id, String title, String description, String source, LocalDateTime pubDate, String link, String guid) {
+    public News(Integer id, String title, String description, String source, String link, String thumbnail) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.source = source;
-        this.pubDate = pubDate;
         this.link = link;
-        this.guid = guid;
+        this.thumbnail = thumbnail;
     }
+
 
     /**
      * Retorna o identificador da notícia.
@@ -116,24 +112,6 @@ public class News {
     }
 
     /**
-     * Retorna a data de publicação da notícia.
-     *
-     * @return data de publicação da notícia.
-     */
-    public LocalDateTime getPubDate() {
-        return pubDate;
-    }
-
-    /**
-     * Define a data de publicação da notícia.
-     *
-     * @param pubDate data de publicação da notícia.
-     */
-    public void setPubDate(LocalDateTime pubDate) {
-        this.pubDate = pubDate;
-    }
-
-    /**
      * Retorna o link da notícia.
      *
      * @return link da notícia.
@@ -152,20 +130,20 @@ public class News {
     }
 
     /**
-     * Retorna o identificador da notícia.
+     * Retorna o link da imagem da notícia.
      *
-     * @return identificador da notícia.
+     * @return link da imagem da notícia.
      */
-    public String getGuid() {
-        return guid;
+    public String getThumbnail() {
+        return thumbnail;
     }
 
     /**
-     * Define o identificador da notícia.
+     * Define o link da imagem da notícia.
      *
-     * @param guid identificador da notícia.
+     * @param thumbnail link da imagem da notícia.
      */
-    public void setGuid(String guid) {
-        this.guid = guid;
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

@@ -13,9 +13,8 @@ public class NewsDAO extends DAO<News> {
         put("TITLE", "Title");
         put("DESCRIPTION", "Description");
         put("SOURCE", "Source");
-        put("PUB_DATE", "PubDate");
         put("LINK", "Link");
-        put("GUID", "Guid");
+        put("THUMBNAIL", "Thumbnail");
     }};
 
     /**

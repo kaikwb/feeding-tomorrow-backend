@@ -2,22 +2,18 @@ package br.com.fiap.feeding_tomorrow.news;
 
 import br.com.fiap.feeding_tomorrow.beans.News;
 import br.com.fiap.feeding_tomorrow.dao.NewsDAO;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 public class GoogleNewsDownloader {
-    private String rssFeedUrl;
-    private NewsDAO newsDao;
+    private final String rssFeedUrl;
+    private final NewsDAO newsDao;
 
     /**
      * Cria um downloader de notícias do Google News.
@@ -36,38 +32,46 @@ public class GoogleNewsDownloader {
      * @throws IOException caso ocorra algum erro ao fazer o download das notícias.
      */
     public void downloadNews() throws IOException {
-        Document doc = Jsoup.connect(rssFeedUrl).get();
-        Elements items = doc.select("item");
+        try {
+            URL url = new URL(rssFeedUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        for (Element item : items) {
-            String title = item.select("title").first().text();
-            String description = item.select("description").first().text();
-            String source = item.select("source").first().text();
-            String pubDate = item.select("pubDate").first().text();
-            String link = item.select("link").first().text();
-            String guid = item.select("guid").first().text();
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                JsonObject root = Json.createReader(connection.getInputStream()).readObject();
+                JsonArray items = root.getJsonArray("items");
 
-            LocalDateTime publicationDateTime = parsePubDate(pubDate);
+                for (JsonObject item : items.getValuesAs(JsonObject.class)) {
+                    JsonObject pageMap = item.getJsonObject("pagemap");
+                    JsonObject metatags = pageMap.getJsonArray("metatags").getJsonObject(0);
 
-            News news = new News(null, title, description, source, publicationDateTime, link, guid);
+                    String title = metatags.getString("title");
 
-            try {
-                newsDao.create(news, "Guid");
-            } catch (Exception e) {
-                e.printStackTrace();
+                    String description = null;
+                    if (metatags.containsKey("og:description")) {
+                        description = metatags.getString("og:description");
+                    }
+
+                    String source = item.getString("displayLink");
+                    String urlNews = item.getString("link");
+
+                    String imageUrl = null;
+                    if (metatags.containsKey("og:image")) {
+                        imageUrl = metatags.getString("og:image");
+                    }
+
+                    News news = new News(null, title, description, source, urlNews, imageUrl);
+                    newsDao.create(news, "Link");
+                }
+            } else {
+                System.out.println("Erro na requisição. Código de resposta: " + responseCode);
             }
+            connection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Converte uma data de publicação de uma notícia do formato RFC 1123 para LocalDateTime.
-     *
-     * @param pubDate data de publicação da notícia no formato RFC 1123.
-     * @return data de publicação da notícia no formato LocalDateTime.
-     */
-    private LocalDateTime parsePubDate(String pubDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.ENGLISH);
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(pubDate, formatter);
-        return zonedDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
     }
 }

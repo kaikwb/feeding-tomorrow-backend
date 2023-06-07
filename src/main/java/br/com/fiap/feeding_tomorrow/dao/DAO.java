@@ -335,7 +335,7 @@ public class DAO<T> {
         }
 
         if (itemsPerPage == null) {
-            itemsPerPage = 10;
+            itemsPerPage = 500;
         }
 
         if (orderBy != null) {

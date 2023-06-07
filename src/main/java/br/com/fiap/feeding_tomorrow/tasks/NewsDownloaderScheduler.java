@@ -12,8 +12,8 @@ import java.util.TimerTask;
 
 @WebListener
 public class NewsDownloaderScheduler implements ServletContextListener {
-    private static final long TASK_PERIOD_MS = 1000 * 60 * 5; // 5 minutes
-    private final String rssFeedUrl = "https://news.google.com/rss/search?q=combate a fome&hl=pt-BR&gl=BR&ceid=BR:pt-419";
+    private static final long TASK_PERIOD_MS = 1000 * 60 * 30; // 30 minutes
+    private final String rssFeedUrl = "https://www.googleapis.com/customsearch/v1?key=AIzaSyChEZJVCb3w0Sq0_NfPCSHptaBsRxk7cqs&cx=b0e227d57b1ba4fea&q=combate%20a%20fome&siteSearch=g1.globo.com&siteSearchFilter=I&dateRestrict=d[7]&sort=date";
 
     private Timer timer;
 
