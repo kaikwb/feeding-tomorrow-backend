@@ -1,15 +1,15 @@
 package br.com.fiap.feeding_tomorrow.beans;
 
-import jakarta.annotation.Nullable;
+import jakarta.json.bind.annotation.JsonbNillable;
 
 public class News {
     private Integer id;
     private String title;
-    @Nullable
+    @JsonbNillable()
     private String description;
     private String source;
     private String link;
-    @Nullable
+    @JsonbNillable()
     private String thumbnail;
 
 

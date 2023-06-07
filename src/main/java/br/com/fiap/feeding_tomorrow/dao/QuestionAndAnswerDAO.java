@@ -13,6 +13,7 @@ public class QuestionAndAnswerDAO extends DAO<QuestionAndAnswer> {
         put("QUESTION", "Question");
         put("ASKED_BY", "AskedBy");
         put("ANSWER", "Answer");
+        put("MAIL", "Mail");
         put("ANSWERED_BY", "AnsweredBy");
         put("CREATED_AT", "CreatedAt");
     }};

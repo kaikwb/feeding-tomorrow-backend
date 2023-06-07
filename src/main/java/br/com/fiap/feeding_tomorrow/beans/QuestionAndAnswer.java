@@ -11,6 +11,7 @@ public class QuestionAndAnswer {
     private String askedBy;
     @JsonbNillable()
     private String answer;
+    private String mail;
     @JsonbNillable()
     private String answeredBy;
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss")
@@ -29,14 +30,16 @@ public class QuestionAndAnswer {
      * @param question   pergunta.
      * @param askedBy    quem perguntou.
      * @param answer     resposta.
+     * @param mail       email.
      * @param answeredBy quem respondeu.
      * @param createdAt  data de criação.
      */
-    public QuestionAndAnswer(Integer id, String question, String askedBy, String answer, String answeredBy, LocalDateTime createdAt) {
+    public QuestionAndAnswer(Integer id, String question, String askedBy, String answer, String mail, String answeredBy, LocalDateTime createdAt) {
         this.id = id;
         this.question = question;
         this.askedBy = askedBy;
         this.answer = answer;
+        this.mail = mail;
         this.answeredBy = answeredBy;
         this.createdAt = createdAt;
     }
@@ -111,6 +114,24 @@ public class QuestionAndAnswer {
      */
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    /**
+     * Retorna o email.
+     *
+     * @return email.
+     */
+    public String getMail() {
+        return mail;
+    }
+
+    /**
+     * Define o email.
+     *
+     * @param mail email.
+     */
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     /**

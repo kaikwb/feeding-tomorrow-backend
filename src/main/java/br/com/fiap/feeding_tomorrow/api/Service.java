@@ -42,6 +42,8 @@ public class Service<T> {
         Object exceptionClass = e.getClass();
         String exceptionMessage = e.getMessage();
 
+        e.printStackTrace();
+
         if (exceptionClass == NotFoundException.class) {
             Error error = new Error(ErrorCode.NOT_FOUND, exceptionMessage);
             return Response.status(Response.Status.NOT_FOUND).entity(error).build();
